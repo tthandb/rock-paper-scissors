@@ -6,6 +6,7 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 const CHOICES = [
@@ -34,6 +35,17 @@ const Button = (props) => (
   </TouchableOpacity>
 );
 
+const ChoiceCard = ({ player, choice: { uri, name } }) => {
+  const title = name && name.charAt(0).toUpperCase() + name.slice(1);
+  return (
+    <View style={styles.choiceContainer}>
+      <Text style={styles.choiceDescription}>Player</Text>
+      <Image source={{ uri }} resizeMode="contain" style={styles.choiceImage} />
+      <Text style={styles.choiceCardTitle}>{title}</Text>
+    </View>
+  );
+};
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -48,6 +60,11 @@ export default class App extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <Text>{this.state.gamePrompt}</Text>
+        <View style={styles.choicesContainer}>
+          <ChoiceCard player="Player" choice={CHOICES[0]} />
+          <Text style={{ color: "#250902" }}>vs</Text>
+          <ChoiceCard player="Computer" choice={CHOICES[1]} />
+        </View>
         {CHOICES.map((choice) => {
           return (
             <Button
