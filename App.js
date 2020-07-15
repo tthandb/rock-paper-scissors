@@ -45,25 +45,57 @@ const ChoiceCard = ({ player, choice: { uri, name } }) => {
     </View>
   );
 };
-
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       gamePrompt: "Choose your weapon!",
+      userChoice: {},
+      computerChoice: {},
     };
   }
-  onPress = (userChoice) => {
-    console.log("userChoice", userChoice);
+  onPress = (playerChoice) => {
+    console.log("userChoice", this.state.userChoice);
+    const [result, compChoice] = this.getRoundOutcome(playerChoice);
+    const newUserChoice = CHOICES.find(
+      (choice) => choice.name === playerChoice
+    );
+    const newComputerChoice = CHOICES.find(
+      (choice) => choice.name === compChoice
+    );
+    this.setState({
+      gamePrompt: result,
+      userChoice: newUserChoice,
+      computerChoice: newComputerChoice,
+    });
+  };
+
+  randomComputerChoice = () =>
+    CHOICES[Math.floor(Math.random() * CHOICES.length)];
+
+  getRoundOutcome = (userChoice) => {
+    const computerChoice = this.randomComputerChoice().name;
+    let result;
+    if (userChoice === "rock") {
+      result = computerChoice === "scissors" ? "Victory!" : "Defeat!";
+    }
+    if (userChoice === "paper") {
+      result = computerChoice === "rock" ? "Victory!" : "Defeat!";
+    }
+    if (userChoice === "scissors") {
+      result = computerChoice === "paper" ? "Victory!" : "Defeat!";
+    }
+    if (userChoice === computerChoice) result = "Tie!";
+    return [result, computerChoice];
   };
   render() {
     return (
       <SafeAreaView style={styles.container}>
         <Text>{this.state.gamePrompt}</Text>
         <View style={styles.choicesContainer}>
-          <ChoiceCard player="Player" choice={CHOICES[0]} />
+          <ChoiceCard player="Player" choice={this.state.userChoice} />
           <Text style={{ color: "#250902" }}>vs</Text>
-          <ChoiceCard player="Computer" choice={CHOICES[1]} />
+          <ChoiceCard player="Computer" choice={this.state.computerChoice} />
         </View>
         {CHOICES.map((choice) => {
           return (
