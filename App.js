@@ -88,10 +88,18 @@ export default class App extends React.Component {
     if (userChoice === computerChoice) result = "Tie!";
     return [result, computerChoice];
   };
+
+  getResultColor = () => {
+    if (this.state.gamePrompt === "Victory!") return "green";
+    if (this.state.gamePrompt === "Defeat!") return "red";
+    return "blue";
+  };
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>{this.state.gamePrompt}</Text>
+        <Text style={{ fontSize: 35, color: this.getResultColor() }}>
+          {this.state.gamePrompt}
+        </Text>
         <View style={styles.choicesContainer}>
           <ChoiceCard player="Player" choice={this.state.userChoice} />
           <Text style={{ color: "#250902" }}>vs</Text>
