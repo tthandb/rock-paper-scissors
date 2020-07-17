@@ -131,6 +131,7 @@ export default class App extends React.Component {
   getResultColor = () => {
     if (this.state.gamePrompt === VICTORY) return "green";
     if (this.state.gamePrompt === DEFEAT) return "red";
+    if (this.state.gamePrompt === TIE) return "grey";
     return "blue";
   };
   render() {
@@ -197,6 +198,9 @@ const styles = StyleSheet.create({
     paddingTop: 100,
     shadowRadius: 5,
     paddingBottom: 100,
+    paddingHorizontal: 10,
+    width: 400,
+    height: 350,
     borderColor: "grey",
     shadowOpacity: 0.9,
     flexDirection: "row",
@@ -211,7 +215,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   choiceDescription: {
-    fontSize: 25,
+    fontSize: 20,
     color: "#250902",
     fontWeight: "bold",
     textDecorationLine: "underline",
