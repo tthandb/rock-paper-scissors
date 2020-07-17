@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   StyleSheet,
@@ -46,10 +45,25 @@ class Button extends React.Component {
 class TotalGame extends React.Component {
   render() {
     return (
-      <View>
+      <View style={{ alignItems: "center" }}>
         <Text>Total rounds: {this.props.total}</Text>
-        <Text>Win rounds: {this.props.wins}</Text>
-        <Text>Win rate: {this.props.rate}</Text>
+
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <View>
+            <Text>Win rounds: {this.props.wins} </Text>
+            <Text>Win rate: {this.props.winRate}</Text>
+          </View>
+          <View style={{ marginHorizontal: 5 }}></View>
+          <View>
+            <Text>Lose rounds: {this.props.loses} </Text>
+            <Text>Lose rate: {this.props.loseRate}</Text>
+          </View>
+          <View style={{ marginHorizontal: 5 }}></View>
+          <View>
+            <Text>Tie rounds: {this.props.ties}</Text>
+            <Text>Tie rate: {this.props.tieRate}</Text>
+          </View>
+        </View>
         <Text></Text>
       </View>
     );
@@ -74,16 +88,20 @@ export default class App extends React.Component {
       computerChoice: {},
       totalRounds: 0,
       winRounds: 0,
+      loseRounds: 0,
+      tieRounds: 0,
       winRate: "0%",
+      loseRate: "0%",
+      tieRate: "0%",
     };
   }
   onPress = (playerChoice) => {
-    const [result, compChoice] = this.getRoundResult(playerChoice);
+    const [result, computerChoice] = this.getRoundResult(playerChoice);
     const newUserChoice = CHOICES.find(
       (choice) => choice.name === playerChoice
     );
     const newComputerChoice = CHOICES.find(
-      (choice) => choice.name === compChoice
+      (choice) => choice.name === computerChoice
     );
     this.setState((prevState) => {
       return {
@@ -93,6 +111,10 @@ export default class App extends React.Component {
         totalRounds: prevState.totalRounds + 1,
         winRounds:
           result === VICTORY ? prevState.winRounds + 1 : prevState.winRounds,
+        loseRounds:
+          result === DEFEAT ? prevState.loseRounds + 1 : prevState.loseRounds,
+        tieRounds:
+          result === TIE ? prevState.tieRounds + 1 : prevState.tieRounds,
         winRate:
           result === VICTORY
             ? (
@@ -101,6 +123,26 @@ export default class App extends React.Component {
               ).toFixed(2) + "%"
             : (
                 (prevState.winRounds / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%",
+        loseRate:
+          result === DEFEAT
+            ? (
+                ((prevState.loseRounds + 1) / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%"
+            : (
+                (prevState.loseRounds / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%",
+        tieRate:
+          result === TIE
+            ? (
+                ((prevState.tieRounds + 1) / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%"
+            : (
+                (prevState.tieRounds / (prevState.totalRounds + 1)) *
                 100
               ).toFixed(2) + "%",
       };
@@ -144,7 +186,11 @@ export default class App extends React.Component {
           <TotalGame
             total={this.state.totalRounds}
             wins={this.state.winRounds}
-            rate={this.state.winRate}
+            loses={this.state.loseRounds}
+            ties={this.state.tieRounds}
+            winRate={this.state.winRate}
+            loseRate={this.state.loseRate}
+            tieRate={this.state.tieRate}
           />
         </View>
         <View style={styles.choicesContainer}>
