@@ -46,8 +46,6 @@ class TotalGame extends React.Component {
   render() {
     return (
       <View style={{ alignItems: "center" }}>
-        <Text>Total rounds: {this.props.total}</Text>
-
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View>
             <Text>Win rounds: {this.props.wins} </Text>
@@ -57,6 +55,10 @@ class TotalGame extends React.Component {
           <View>
             <Text>Lose rounds: {this.props.loses} </Text>
             <Text>Lose rate: {this.props.loseRate}</Text>
+            <View style={{ marginTop: 2 }}></View>
+            <Text style={{ fontWeight: "bold" }}>
+              Total rounds: {this.props.total}
+            </Text>
           </View>
           <View style={{ marginHorizontal: 5 }}></View>
           <View>
@@ -174,7 +176,7 @@ export default class App extends React.Component {
     if (this.state.gamePrompt === VICTORY) return "green";
     if (this.state.gamePrompt === DEFEAT) return "red";
     if (this.state.gamePrompt === TIE) return "grey";
-    return "blue";
+    return "black";
   };
   render() {
     return (
