@@ -8,39 +8,59 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+const ROCK = "rock";
+const PAPER = "paper";
+const SCISSORS = "scissors";
+const VICTORY = "Victory!";
+const DEFEAT = "Defeat!";
+const TIE = "Tie.";
 
 const CHOICES = [
   {
-    name: "rock",
-    uri: "http://pngimg.com/uploads/stone/stone_PNG13622.png",
+    name: ROCK,
+    uri: require("./assets/stone.png"),
   },
   {
-    name: "paper",
-    uri: "https://www.stickpng.com/assets/images/5887c26cbc2fc2ef3a186046.png",
+    name: PAPER,
+    uri: require("./assets/paper.png"),
   },
   {
-    name: "scissors",
-    uri:
-      "http://pluspng.com/img-png/png-hairdressing-scissors-beauty-salon-scissors-clipart-4704.png",
+    name: SCISSORS,
+    uri: require("./assets/scissors.png"),
   },
 ];
-const Button = (props) => (
-  <TouchableOpacity
-    style={styles.buttonStyle}
-    onPress={() => props.onPress(props.name)}
-  >
-    <Text style={styles.buttonText}>
-      {props.name.charAt(0).toUpperCase() + props.name.slice(1)}
-    </Text>
-  </TouchableOpacity>
-);
-
+class Button extends React.Component {
+  render() {
+    return (
+      <TouchableOpacity
+        style={styles.buttonStyle}
+        onPress={() => this.props.onPress(this.props.name)}
+      >
+        <Text style={styles.buttonText}>
+          {this.props.name.charAt(0).toUpperCase() + this.props.name.slice(1)}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+}
+class TotalGame extends React.Component {
+  render() {
+    return (
+      <View>
+        <Text>Total rounds: {this.props.total}</Text>
+        <Text>Win rounds: {this.props.wins}</Text>
+        <Text>Win rate: {this.props.rate}</Text>
+        <Text></Text>
+      </View>
+    );
+  }
+}
 const ChoiceCard = ({ player, choice: { uri, name } }) => {
   const title = name && name.charAt(0).toUpperCase() + name.slice(1);
   return (
     <View style={styles.choiceContainer}>
-      <Text style={styles.choiceDescription}>Player</Text>
-      <Image source={{ uri }} resizeMode="contain" style={styles.choiceImage} />
+      <Text style={styles.choiceDescription}>{player}</Text>
+      <Image source={uri} resizeMode="contain" style={styles.choiceImage} />
       <Text style={styles.choiceCardTitle}>{title}</Text>
     </View>
   );
@@ -49,60 +69,86 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      gamePrompt: "Choose your weapon!",
+      gamePrompt: "Choose your choice!",
       userChoice: {},
       computerChoice: {},
+      totalRounds: 0,
+      winRounds: 0,
+      winRate: "0%",
     };
   }
   onPress = (playerChoice) => {
-    console.log("userChoice", this.state.userChoice);
-    const [result, compChoice] = this.getRoundOutcome(playerChoice);
+    const [result, compChoice] = this.getRoundResult(playerChoice);
     const newUserChoice = CHOICES.find(
       (choice) => choice.name === playerChoice
     );
     const newComputerChoice = CHOICES.find(
       (choice) => choice.name === compChoice
     );
-    this.setState({
-      gamePrompt: result,
-      userChoice: newUserChoice,
-      computerChoice: newComputerChoice,
+    this.setState((prevState) => {
+      return {
+        gamePrompt: result,
+        userChoice: newUserChoice,
+        computerChoice: newComputerChoice,
+        totalRounds: prevState.totalRounds + 1,
+        winRounds:
+          result === VICTORY ? prevState.winRounds + 1 : prevState.winRounds,
+        winRate:
+          result === VICTORY
+            ? (
+                ((prevState.winRounds + 1) / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%"
+            : (
+                (prevState.winRounds / (prevState.totalRounds + 1)) *
+                100
+              ).toFixed(2) + "%",
+      };
     });
   };
 
   randomComputerChoice = () =>
     CHOICES[Math.floor(Math.random() * CHOICES.length)];
 
-  getRoundOutcome = (userChoice) => {
+  getRoundResult = (userChoice) => {
     const computerChoice = this.randomComputerChoice().name;
     let result;
-    if (userChoice === "rock") {
-      result = computerChoice === "scissors" ? "Victory!" : "Defeat!";
+    switch (userChoice) {
+      case ROCK:
+        result = computerChoice === SCISSORS ? VICTORY : DEFEAT;
+        break;
+      case PAPER:
+        result = computerChoice === ROCK ? VICTORY : DEFEAT;
+        break;
+      case SCISSORS:
+        result = computerChoice === PAPER ? VICTORY : DEFEAT;
+        break;
     }
-    if (userChoice === "paper") {
-      result = computerChoice === "rock" ? "Victory!" : "Defeat!";
-    }
-    if (userChoice === "scissors") {
-      result = computerChoice === "paper" ? "Victory!" : "Defeat!";
-    }
-    if (userChoice === computerChoice) result = "Tie!";
+    if (userChoice === computerChoice) result = TIE;
     return [result, computerChoice];
   };
 
   getResultColor = () => {
-    if (this.state.gamePrompt === "Victory!") return "green";
-    if (this.state.gamePrompt === "Defeat!") return "red";
+    if (this.state.gamePrompt === VICTORY) return "green";
+    if (this.state.gamePrompt === DEFEAT) return "red";
     return "blue";
   };
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={{ fontSize: 35, color: this.getResultColor() }}>
-          {this.state.gamePrompt}
-        </Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ fontSize: 35, color: this.getResultColor() }}>
+            {this.state.gamePrompt}
+          </Text>
+          <TotalGame
+            total={this.state.totalRounds}
+            wins={this.state.winRounds}
+            rate={this.state.winRate}
+          />
+        </View>
         <View style={styles.choicesContainer}>
           <ChoiceCard player="Player" choice={this.state.userChoice} />
-          <Text style={{ color: "#250902" }}>vs</Text>
+          <Text style={styles.vsText}>vs</Text>
           <ChoiceCard player="Computer" choice={this.state.computerChoice} />
         </View>
         {CHOICES.map((choice) => {
@@ -144,6 +190,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  vsText: { color: "#250902" },
   choicesContainer: {
     margin: 10,
     borderWidth: 2,
